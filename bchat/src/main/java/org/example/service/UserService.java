@@ -9,9 +9,9 @@ import org.example.repository.UserRepository;
 
 public class UserService {
   //test
-  private final String TEST_ID = "test123";
-  private final String TEST_PW = "1234";
-  private final String TEST_NICKNAME = "admin";
+//  private final String TEST_ID = "test123";
+//  private final String TEST_PW = "1234";
+//  private final String TEST_NICKNAME = "admin";
 
   private final String DRIVER = "oracle.jdbc.driver.OracleDriver";
   private final String URL = "jdbc:oracle:thin:@localhost:1521:STR";
@@ -21,11 +21,33 @@ public class UserService {
   public UserService() {};
 
   /**
+   * 로그인
+   */
+  public User login(String id, String pw) {
+    User findUser = null;
+    try{
+      Class.forName(DRIVER); // 드라이버를 메모리 로드
+      Connection connection = DriverManager.getConnection(URL, DB_ID, DB_PW);
+      UserRepository userRepository = new UserRepository(connection);
+
+      //GUI 에서 얻은.. 정보..
+      findUser = userRepository.findByIdNPw(id,pw);
+      connection.close();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+    return findUser;
+  }
+
+  /**
    * 회원 가입
    */
-  public void register() {
+  public void register(String[] data) {
+    User user = dataToUser(data);
     // 1. 중복 회원 검증(필수)
-//    validateDuplicateUser(TEST_ID, TEST_NICKNAME);
+    validateDuplicateUser(user.getId(), user.getNickname());
 
     // 2. 회원 등록
     try{
@@ -34,12 +56,13 @@ public class UserService {
       UserRepository userRepository = new UserRepository(connection);
 
       //GUI 에서 얻은.. 정보..
-      User user = User.createUser(TEST_ID, TEST_PW, TEST_NICKNAME);
-      user = userRepository.save(user);
-      Profile profile = new Profile(user.getUserId(), "관리자", "010-1234-5678", "admin@gmail.com");
-      userRepository.save(profile);
+      User newUser = User.createUser(user.getId(), user.getPw(), user.getNickname());
+      newUser = userRepository.save(newUser);
+      Profile newProfile = dataToProfile(newUser.getUserId(), data);
+//      Profile profile = new Profile(newUser.getUserId(), "관리자", "010-1234-5678", "admin@gmail.com");
+      userRepository.save(newProfile);
 
-      System.out.println("사용자가 성공적으로 저장되었습니다. 생성된 ID: " + user);
+      System.out.println("사용자가 성공적으로 저장되었습니다. 생성된 ID: " + newUser.getUserId());
       connection.close();
     } catch (SQLException e) {
       e.printStackTrace();
@@ -70,5 +93,14 @@ public class UserService {
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
+  }
+
+  private User dataToUser(String[] data) {
+    User user = User.createUser(data[0], data[1], data[2]);
+    return user;
+  }
+  private Profile dataToProfile(Long id, String[] data) {
+    Profile profile = new Profile(id, data[3], data[4], data[5]);
+    return profile;
   }
 }

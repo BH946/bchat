@@ -15,6 +15,9 @@ public class UserRepository {
     this.connection = connection;
   }
 
+  /**
+   * 회원가입
+   */
   public User save(User user) throws SQLException {
     String[] keyCol ={"user_id"}; //키값이 생성되는 컬럼 명
     String sql = "insert into Member (id, pw, nickname) values (?,?,?)";
@@ -62,6 +65,26 @@ public class UserRepository {
     String sql = "select * from Member where nickname = ?";
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
       statement.setString(1, nickname);
+      ResultSet rs = statement.executeQuery();
+      if (rs.next()) {
+        //중복
+        User findUser = User.createUser(rs.getString(1),rs.getString(2),rs.getString(3));
+        System.out.println("test: user_id값 나오나? : "+rs.getLong(1));
+        return findUser;
+      }
+      return null;
+    }
+  }
+
+  /**
+   * 로그인
+   */
+
+  public User findByIdNPw(String id, String pw) throws SQLException {
+    String sql = "select * from Member where id = ? and pw = ?";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setString(1, id);
+      statement.setString(2, pw);
       ResultSet rs = statement.executeQuery();
       if (rs.next()) {
         //중복

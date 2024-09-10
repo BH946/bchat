@@ -22,4 +22,14 @@ public class Profile {
   public String getEmail() {
     return email;
   }
+
+  @Override
+  public String toString() {
+    return "Profile{" +
+        "profile_id=" + profile_id +
+        ", name='" + name + '\'' +
+        ", col='" + col + '\'' +
+        ", email='" + email + '\'' +
+        '}';
+  }
 }
