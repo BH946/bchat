@@ -1,5 +1,6 @@
 package org.example.repository;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,11 +16,13 @@ public class UserRepository {
   }
 
   public User save(User user) throws SQLException {
-    String sql = "insert into User (id, pw, nickname) values (?,?,?)";
-    try (PreparedStatement statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) { // generatedKeys 반환
+    String[] keyCol ={"user_id"}; //키값이 생성되는 컬럼 명
+    String sql = "insert into Member (id, pw, nickname) values (?,?,?)";
+//    try (PreparedStatement statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) { // generatedKeys 반환
+    try (PreparedStatement statement = connection.prepareStatement(sql, keyCol)) { // generatedKeys 반환
       statement.setString(1, user.getId());
       statement.setString(2, user.getPw());
-      statement.setString(2, user.getNickname());
+      statement.setString(3, user.getNickname());
       statement.executeUpdate(); //주로 반환이 필요없는 dml
       //생성된 키 조회
       ResultSet generatedKeys = statement.getGeneratedKeys();
@@ -42,7 +45,7 @@ public class UserRepository {
   }
 
   public User findById(String id) throws SQLException {
-    String sql = "select * from User where id = ?";
+    String sql = "select * from Member where id = ?";
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
       statement.setString(1, id);
       ResultSet rs = statement.executeQuery();
@@ -56,7 +59,7 @@ public class UserRepository {
     }
   }
   public User findByNickname(String nickname) throws SQLException {
-    String sql = "select * from User where nickname = ?";
+    String sql = "select * from Member where nickname = ?";
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
       statement.setString(1, nickname);
       ResultSet rs = statement.executeQuery();
