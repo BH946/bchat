@@ -21,13 +21,14 @@ public class UDPServer implements Runnable {
     try {
       DatagramSocket socket = new DatagramSocket(port);
       byte[] buffer = new byte[512]; //250자 정도
-      while (true) {
+      while (!Thread.currentThread().isInterrupted()) {
         //수신
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         socket.receive(packet); //대기
-        String[] data = new String(packet.getData(),0, packet.getLength()).split(","); //"id,pw,nickname,name,col,email"
-        System.out.println("test1: "+Arrays.toString(data));
-        
+        String[] data = new String(packet.getData(), 0, packet.getLength()).split(
+            ","); //"id,pw,nickname,name,col,email"
+        System.out.println("test1: " + Arrays.toString(data));
+
         //회원가인 또는 로그인으로 분기
         String response = "";
         UserService userService = new UserService();
@@ -35,7 +36,8 @@ public class UDPServer implements Runnable {
           //로그인 진행 + 응답
           response = "로그인에 성공하셨습니다.";
           User findUser = userService.login(data[0], data[1]);
-          if(findUser == null) response = "로그인에 실패했습니다.";
+          if (findUser == null)
+            response = "로그인에 실패했습니다.";
         } else {
           //회원가입 진행 + 응답
           response = "회원가입을 완료 했습니다.";
@@ -46,7 +48,8 @@ public class UDPServer implements Runnable {
           }
         }
         byte[] resBuf = response.getBytes();
-        DatagramPacket resPacket = new DatagramPacket(resBuf, resBuf.length, packet.getAddress(), packet.getPort());
+        DatagramPacket resPacket = new DatagramPacket(resBuf, resBuf.length, packet.getAddress(),
+            packet.getPort());
         socket.send(resPacket);
         System.out.println(response);
       }
@@ -55,6 +58,7 @@ public class UDPServer implements Runnable {
     } catch (IOException e) { //receive
       e.printStackTrace();
     }
+    System.out.println("스레드 종료");
   }
 
 }
