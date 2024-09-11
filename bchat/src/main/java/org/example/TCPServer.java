@@ -6,12 +6,36 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import org.example.domain.ChatRoom;
+import org.example.domain.Message;
+import org.example.service.ChatRoomService;
+import org.example.service.MessageService;
 
 public class TCPServer implements Runnable {
   private final int port;
+  private final String title;
+  private final Long userId;
+  private final Long chatRoomId;
+  private final MessageService messageService = new MessageService();
 
-  public TCPServer(int port) {
+  public TCPServer(int port, String title, Long userId) {
     this.port = port;
+    this.title = title;
+    this.userId = userId;
+    //최초 db에 채팅방 생성
+    ChatRoomService chatRoomService = new ChatRoomService();
+    ChatRoom newChatRoom = chatRoomService.create(userId, title);
+    this.chatRoomId = newChatRoom.getChatRoom_id();
+  }
+
+  // 이전대화내용
+  public List<Message> findPrevMessages() {
+    List<Message> messages = new ArrayList<>();
+    messages = messageService.findAllByChat(userId, chatRoomId);
+    System.out.println(messages); //debug
+    return messages;
   }
 
   @Override
@@ -29,6 +53,9 @@ public class TCPServer implements Runnable {
         while ((message = br.readLine()) != null) {
           System.out.println("받은 메시지: "+message);
           out.println("메시지 수신: " + message); //응답 메시지 전송
+          //매번 db 기록
+          String[] data = message.split(",",2); //[userId,content]
+          messageService.create(this.chatRoomId, Long.parseLong(data[0]), data[1]);
         }
       }
 
@@ -36,4 +63,6 @@ public class TCPServer implements Runnable {
       e.printStackTrace();
     }
   }
+
+
 }

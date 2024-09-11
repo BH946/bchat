@@ -26,18 +26,17 @@ public class Main {
       e.printStackTrace();
     }
 
-    // 서버 스레드 시작 (무한 루프)
+    // 서버 스레드 시작 (무한 루프) -> userId 임의로.. title 임의로.. 테스트 중
     // 방장이라면??
     if ("방장" == "방장") {
-      serverThread = new Thread(new TCPServer(tcpPort));
+      serverThread = new Thread(new TCPServer(tcpPort, "제목", 1L));
       serverThread.start();
-      TCPClient tcpClient = new TCPClient("localhost", tcpPort); //main 스레드는 계속..
+      TCPClient tcpClient = new TCPClient("localhost", tcpPort, 47L); //main 스레드는 계속..
       tcpClient.start();
     } else {
-      TCPClient tcpClient = new TCPClient("localhost", tcpPort);
+      TCPClient tcpClient = new TCPClient("localhost", tcpPort, 48L);
       tcpClient.start();
     }
-    
 
   }
 

@@ -10,10 +10,12 @@ import java.net.UnknownHostException;
 public class TCPClient {
   private final String serverAddress;
   private final int port;
+  private final Long userId;
 
-  public TCPClient(String serverAddress, int port) {
+  public TCPClient(String serverAddress, int port, Long userId) {
     this.serverAddress = serverAddress;
     this.port = port;
+    this.userId = userId;
   }
 
   public void start() {
@@ -24,7 +26,7 @@ public class TCPClient {
 
       String inputLine;
       while ((inputLine = input.readLine()) != null) {
-        out.println(inputLine); //서버 전송
+        out.println(userId+","+inputLine); //서버 전송 (content+userId)
         System.out.println("서버 응답: "+br.readLine()); //서버 응답 수신
       }
     } catch (UnknownHostException e) {
