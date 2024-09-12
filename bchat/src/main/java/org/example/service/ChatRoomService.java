@@ -39,7 +39,7 @@ public class ChatRoomService {
   }
 
   /**
-   * 채팅방 생성 -> 빠른 개발을 위해 "중복검증 생략"
+   * 채팅방 생성 -> "중복검증을 하고, 이미 DB에 있으면 있는값을 반환"
    */
   public ChatRoom create(Long id, String title) {
     ChatRoom newChatRoom=null;
@@ -47,6 +47,9 @@ public class ChatRoomService {
       Class.forName(DRIVER); // 드라이버를 메모리 로드
       Connection connection = DriverManager.getConnection(URL, DB_ID, DB_PW);
       ChatRoomRepository chatRoomRepository = new ChatRoomRepository(connection);
+
+      newChatRoom = chatRoomRepository.findByIdNTitle(id, title);
+      if(newChatRoom!=null) return newChatRoom;
 
       //GUI 에서 얻은.. 정보..
       ChatRoom chatRoom = new ChatRoom(title, id);

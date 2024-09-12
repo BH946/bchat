@@ -40,7 +40,7 @@ public class ChatRoomRepository {
       statement.setString(2, title);
       ResultSet rs = statement.executeQuery();
       if (rs.next()) {
-        ChatRoom findChatRoom = new ChatRoom(rs.getString(2), rs.getLong(3));
+        ChatRoom findChatRoom = new ChatRoom(rs.getLong(1), rs.getString(2), rs.getLong(3), rs.getTimestamp(4));
         System.out.println(findChatRoom); //debug
         return findChatRoom;
       }

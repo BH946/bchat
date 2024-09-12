@@ -13,6 +13,12 @@ public class ChatRoom {
     this.title = title;
     user_id = userId;
   }
+  public ChatRoom(Long chatRoomId, String title, Long userId, Timestamp createdAt) {
+    chatRoom_id = chatRoomId;
+    this.title = title;
+    user_id = userId;
+    created_at = createdAt;
+  }
 
   public void setChatRoom_id(Long chatRoom_id) {
     this.chatRoom_id = chatRoom_id;
