@@ -16,11 +16,11 @@ public class Message {
     this.content = content;
   }
   public Message(Long messageId, Long chatRoomId, Long userId, String content, Timestamp createdAt) {
-    messageId = message_id;
+    message_id = messageId;
     chatRoom_id = chatRoomId;
     user_id = userId;
     this.content = content;
-    createdAt = created_at;
+    created_at = createdAt;
   }
 
   public void setMessage_id(Long message_id) {
@@ -49,5 +49,16 @@ public class Message {
 
   public String getContent() {
     return content;
+  }
+
+  @Override
+  public String toString() {
+    return "Message{" +
+        "message_id=" + message_id +
+        ", chatRoom_id=" + chatRoom_id +
+        ", user_id=" + user_id +
+        ", content='" + content + '\'' +
+        ", created_at=" + created_at +
+        '}';
   }
 }

@@ -35,7 +35,9 @@ public class TCPServer implements Runnable {
   public List<Message> findPrevMessages() {
     List<Message> messages = new ArrayList<>();
     messages = messageService.findAllByChat(userId, chatRoomId);
-    System.out.println(messages); //debug
+    for (Message msg : messages) {
+      System.out.println(msg); //debug
+    }
     return messages;
   }
 
@@ -43,10 +45,11 @@ public class TCPServer implements Runnable {
   public void run() {
     try{
       ServerSocket serverSocket = new ServerSocket(port);
-      while (true) {
+      while (!Thread.currentThread().isInterrupted()) {
         System.out.println("서버가 포트=" + port + " 에서 대기중");
         Socket socket = serverSocket.accept(); //clientSocket
         System.out.println("클라 연결 성공");
+        // findPrevMessages(); //test code
 
         ClientHandler clientHandler = new ClientHandler(socket); //new Thread
         clientHandlers.add(clientHandler);

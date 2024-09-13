@@ -270,9 +270,9 @@ public class ChatApp {
     return panel;
   }
 
-
-
   public static void main(String[] args) {
     SwingUtilities.invokeLater(ChatApp::new);
   }
+
+
 }

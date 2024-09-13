@@ -45,9 +45,8 @@ public class MessageRepository {
       statement.setLong(1, userId);
       statement.setLong(2, chatRoomId);
       ResultSet rs = statement.executeQuery();
-      if (rs.next()) {
+      while (rs.next()) {
         Message findMessage = new Message(rs.getLong(1), rs.getLong(2), rs.getLong(3), rs.getString(4), rs.getTimestamp(5));
-        System.out.println(findMessage); //debug
         findMessages.add(findMessage);
       }
       return findMessages;
