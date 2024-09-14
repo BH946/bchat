@@ -87,9 +87,9 @@ public class UserRepository {
       statement.setString(2, pw);
       ResultSet rs = statement.executeQuery();
       if (rs.next()) {
-        //중복
         User findUser = User.createUser(rs.getString(1),rs.getString(2),rs.getString(3));
-        System.out.println("test: user_id값 나오나? : "+rs.getLong(1));
+        findUser.setId(rs.getLong(1));
+        System.out.println("로그인 user_id값 : "+findUser.getUserId()); //debug
         return findUser;
       }
       return null;

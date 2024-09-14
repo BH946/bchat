@@ -9,6 +9,9 @@ import org.example.utils.TCPServer;
 import org.example.utils.UDPClient;
 import org.example.utils.UDPServer;
 
+/**
+ * GUI 없이 테스트 Main 함수 -> utils 패키지 활용
+ */
 public class Main {
   public static void main(String[] args) throws IOException {
     int udpPort = 9876; int tcpPort = 9785;
@@ -20,7 +23,7 @@ public class Main {
 //    udpRegisterTest(port);
 //    udpLoginTest(port);
     // 로그인 했다면??
-//    serverThread.interrupt(); //블로킹 상태일 위 스레드는 이제 종료
+//    serverThread.interrupt(); //블로킹 상태일 위 스레드는 이제 종료 -> 종료 안 할거임.
 //    try {
 //      serverThread.join(); // 스레드 종료 대기
 //    } catch (InterruptedException e) {
@@ -35,16 +38,15 @@ public class Main {
       System.out.println("방장임돠");
       serverThread = new Thread(new TCPServer(tcpPort, "제목", 47L));
       serverThread.start();
-      TCPClient tcpClient = new TCPClient("localhost", tcpPort, 47L); //main 스레드는 계속..
-      tcpClient.start();
+      Thread clientThread = new Thread(new TCPClient("localhost", tcpPort, 47L));
+      clientThread.start();
     } else if(input.equals("일반")) {
       System.out.println("일반유저임돠");
-      TCPClient tcpClient = new TCPClient("localhost", tcpPort, 48L);
-      tcpClient.start();
+      Thread clientThread = new Thread(new TCPClient("localhost", tcpPort, 48L));
+      clientThread.start();
     }
 
   }
-
 
 
   /**

@@ -39,7 +39,7 @@ public class ChatRoomService {
   }
 
   /**
-   * 채팅방 생성 -> "중복검증을 하고, 이미 DB에 있으면 있는값을 반환"
+   * 채팅방 생성 -> "중복검증 필요없음. 그냥 DB에 있으면 있는값을 반환"
    */
   public ChatRoom create(Long id, String title) {
     ChatRoom newChatRoom=null;
@@ -48,8 +48,9 @@ public class ChatRoomService {
       Connection connection = DriverManager.getConnection(URL, DB_ID, DB_PW);
       ChatRoomRepository chatRoomRepository = new ChatRoomRepository(connection);
 
+      //중복검증 (조회 해보기)
       newChatRoom = chatRoomRepository.findByIdNTitle(id, title);
-      if(newChatRoom!=null) return newChatRoom;
+      if(newChatRoom!=null) return newChatRoom; // 기존 채팅방 사용
 
       //GUI 에서 얻은.. 정보..
       ChatRoom chatRoom = new ChatRoom(title, id);

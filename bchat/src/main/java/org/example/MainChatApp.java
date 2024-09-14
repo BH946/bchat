@@ -1,14 +1,20 @@
-package org.example.swing;
+package org.example;
+import java.net.SocketException;
+import java.util.List;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import org.example.utils.UDPServer;
+import org.example.utils.gui.TCPClientGui;
+import org.example.utils.TCPServer;
+import org.example.utils.gui.TCPServerGui;
+import org.example.utils.gui.UDPClientGui;
+import org.example.utils.gui.UDPServerGui;
 
-public class ChatApp {
+public class MainChatApp {
   private JFrame frame;
   private CardLayout cardLayout;
 
-  public ChatApp() {
+  public MainChatApp() {
     frame = new JFrame("Chat Application");
     cardLayout = new CardLayout();
     frame.setLayout(cardLayout);
@@ -71,11 +77,26 @@ public class ChatApp {
     panel.add(buttonPanel);
 
     loginButton.addActionListener(e -> {
-      // 로그인 처리 로직 추가
-      cardLayout.show(frame.getContentPane(), "home");
+      // #로그인 처리 로직 추가
+      char[] password = pwField.getPassword();
+      String pw = new String(password); // char 배열을 String으로 변환
+      String[] data = {idField.getText(), pw};
+      UDPClientGui udpClientGui = new UDPClientGui(udpIP, udpPort, data);
+      udpClientGui.udpClientLogin();
+      String[] response = udpClientGui.getResponse().split(",",2);
+      if (response[1].equals("로그인에 성공하셨습니다.")) {
+        cardLayout.show(frame.getContentPane(), "home");
+        userId = Long.parseLong(response[0]);
+      } else {
+        // 로그인 실패 메시지 표시
+        JOptionPane.showMessageDialog(frame, "로그인 실패. "+udpClientGui.getResponse(), "오류", JOptionPane.ERROR_MESSAGE);
+      }
     });
 
-    registerButton.addActionListener(e -> cardLayout.show(frame.getContentPane(), "register"));
+    registerButton.addActionListener(e -> {
+      // 회원가입 버튼
+      cardLayout.show(frame.getContentPane(), "register");
+    });
 
     return panel;
   }
@@ -107,8 +128,19 @@ public class ChatApp {
     panel.add(cancelButton);
 
     confirmButton.addActionListener(e -> {
-      // 회원가입 처리 로직 추가
-      cardLayout.show(frame.getContentPane(), "login");
+      // #회원가입 처리 로직 추가
+      char[] password = regPwField.getPassword();
+      String pw = new String(password); // char 배열을 String으로 변환
+      String[] data = {regIdField.getText(), pw, nicknameField.getText(), nameField.getText(), phoneField.getText(), emailField.getText()};
+      UDPClientGui udpClientGui = new UDPClientGui(udpIP, udpPort, data);
+      udpClientGui.udpClientRegister();
+      if (udpClientGui.getResponse().equals("회원가입을 완료 했습니다.")) {
+        cardLayout.show(frame.getContentPane(), "login");
+      } else {
+        // 회원가입 실패 메시지 표시
+        JOptionPane.showMessageDialog(frame, "회원가입 실패. "+udpClientGui.getResponse(), "오류", JOptionPane.ERROR_MESSAGE);
+      }
+
     });
 
     cancelButton.addActionListener(e -> cardLayout.show(frame.getContentPane(), "login"));
@@ -183,6 +215,14 @@ public class ChatApp {
       // 채팅방 생성 로직 추가
       cardLayout.show(frame.getContentPane(), "messager");
       createRoomDialog.dispose(); // createRoom 창 닫기
+
+      // #TCP 통신 SET -> 방장
+      tcpPort = Integer.parseInt(portField.getText());
+      Thread serverThread = new Thread(new TCPServerGui(tcpPort, titleField.getText(), userId));
+      serverThread.start();
+      tcpClientGui = new TCPClientGui("localhost", tcpPort, userId);
+      Thread clientThread = new Thread(tcpClientGui);
+      clientThread.start();
     });
 
     cancelButton.addActionListener(e -> {
@@ -218,6 +258,12 @@ public class ChatApp {
       // 채팅방 입장 로직 추가
       cardLayout.show(frame.getContentPane(), "messager");
       joinRoomDialog.dispose(); // joinRoom 창 닫기
+
+      // #TCP 통신 SET
+      tcpPort = Integer.parseInt(portField.getText());
+      tcpClientGui = new TCPClientGui(ipField.getText(), tcpPort, userId);
+      Thread clientThread = new Thread(tcpClientGui);
+      clientThread.start();
     });
 
     cancelButton.addActionListener(e -> {
@@ -233,12 +279,12 @@ public class ChatApp {
   private JPanel createMessagerPanel() {
     JPanel panel = new JPanel(new BorderLayout());
     panel.setBackground(new Color(240, 240, 255));
-    JTextArea chatArea = new JTextArea();
+    chatArea = new JTextArea(); //채팅 출력란
     chatArea.setEditable(false);
     chatArea.setLineWrap(true);
     chatArea.setWrapStyleWord(true);
-    JTextField messageField = new JTextField();
-    JTextArea userArea = new JTextArea(5, 10);
+    JTextField messageField = new JTextField(); //채팅 입력란
+    userArea = new JTextArea(5, 10); //유저 출력란
     userArea.setEditable(false);
     userArea.setText("접속한 유저:\n");
 
@@ -255,13 +301,15 @@ public class ChatApp {
 
     panel.add(inputPanel, BorderLayout.SOUTH); // 입력 패널을 하단에 추가
 
+
+    // #실시간채팅
     messageField.addActionListener(e -> {
       String message = messageField.getText();
-      chatArea.append("나: " + message + "\n");
       messageField.setText("");
       // 서버로 메시지 전송 로직 추가
+      tcpClientGui.out.println(userId+","+message); //서버 전송 (content+userId)
     });
-
+    // #채팅기록
     chatHistoryButton.addActionListener(e -> {
       // 채팅 기록 보여주는 로직 추가 (예: JOptionPane 사용)
       JOptionPane.showMessageDialog(panel, chatArea.getText(), "채팅 기록", JOptionPane.PLAIN_MESSAGE);
@@ -270,9 +318,39 @@ public class ChatApp {
     return panel;
   }
 
+  /**
+   * GUI 사용 메인 함수 -> utils.gui 패키지 활용
+   */
+  static String udpIP = "localhost"; //고정
+  static int udpPort = 9876; //고정
+
+  static int tcpPort = 9785;
+  static Long userId;
+  static JTextArea chatArea;
+  static JTextArea userArea;
+  TCPClientGui tcpClientGui;
   public static void main(String[] args) {
-    SwingUtilities.invokeLater(ChatApp::new);
+    Thread udpServerThread = new Thread(new UDPServerGui(udpPort));
+    udpServerThread.start();
+
+    SwingUtilities.invokeLater(MainChatApp::new);
   }
 
+  /**
+   * TCPClientGui 에서 서버로부터의 메시지를 처리용
+   */
+  public static JTextArea getChatArea() {
+    return chatArea;
+  }
+
+  /**
+   * 유저조회 업뎃
+   */
+  public static void UserListUp(List<Long> userIdList) {
+    userArea.setText("접속한 유저:\n");
+    for (Long userId : userIdList) {
+      userArea.append(String.valueOf(userId)+"\n"); // userId 대신 nickname으로 바꿔도 됨
+    }
+  }
 
 }

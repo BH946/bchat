@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-public class TCPClient {
+public class TCPClient implements Runnable{
   private final String serverAddress;
   private final int port;
   private final Long userId;
@@ -20,26 +20,22 @@ public class TCPClient {
     this.userId = userId;
   }
 
-  public void start() {
-    System.out.println("함수 실행으 ㄴ하겠지"); //debug
+  @Override
+  public void run() {
     try {
       socket = new Socket(serverAddress, port);
-      System.out.println("소켓 되긴 하냐?"+socket); //debug
+      System.out.println("소켓 되냐?"+socket); //debug
       PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
       BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-      System.out.println("여기까지 오냐1"); //debug
       BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-      System.out.println("여기까지 오냐2"); //debug
+      System.out.println("Stream 세팅 - 소켓(서버), 클라"); //debug
 
-      String inputLine;
-      while ((inputLine = input.readLine()) != null) {
-        System.out.println("여기까지 오냐3"); //debug
-        out.println(userId+","+inputLine); //서버 전송 (content+userId)
-        System.out.println("여기까지 오냐4"); //debug
+      while (true) {
+        //br.readLine(), input.readLine()으로 매번 입력을 대기 + 이미 연결 성공했으니 이 부분만 무한반복(while)
+        out.println(userId+","+input.readLine()); //서버 전송 (content+userId)
         System.out.println("서버 응답: "+br.readLine()); //서버 응답 수신
-        System.out.println("여기까지 오냐5"); //debug => 여기부터 멈췄네
+        System.out.println("응답 정상"); //debug
       }
-      System.out.println("여기까지 오냐6"); //debug
     } catch (IOException e) {
       e.printStackTrace();
     } finally {

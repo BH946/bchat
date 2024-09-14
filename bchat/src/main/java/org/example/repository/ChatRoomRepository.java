@@ -15,7 +15,7 @@ public class ChatRoomRepository {
   }
 
   /**
-   * 회원가입
+   * 채팅방 생성
    */
   public ChatRoom save(ChatRoom chatRoom) throws SQLException {
     String[] keyCol ={"chatRoom_id"}; //키 값이 생성되는 컬럼 명
@@ -33,6 +33,9 @@ public class ChatRoomRepository {
     } //try 자동 자원 close
   }
 
+  /**
+   * 채팅방 조회
+   */
   public ChatRoom findByIdNTitle(Long id, String title) throws SQLException {
     String sql = "select * from ChatRoom where created_id = ? and title = ?";
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
