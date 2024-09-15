@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+  <!-- config.xml 안에서 태그 작성시 태그의 사용 순서 -->
+  <!--
+    properties, settings, typeAliases, typeHandlers,
+    objectFactory, objectWrapperFactory, refletorFactory,
+    plugins, environments, databaseIdProvider, mappers
+   -->
+
+  <!-- typeAliases를 통해서 사용하고자 하는 객체를 등록해야함 -->
+  <typeAliases>
+    <typeAlias type="org.example.v2.domain.User" alias="User"/>
+    <typeAlias type="org.example.v2.domain.Profile" alias="Profile"/>
+  </typeAliases>
+
+
+  <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <dataSource type="POOLED">
+        <property name="driver" value="oracle.jdbc.OracleDriver"/>
+        <property name="url" value="jdbc:oracle:thin:@localhost:1521:STR"/>
+        <property name="username" value="testUser"/>
+        <property name="password" value="1234"/>
+      </dataSource>
+    </environment>
+  </environments>
+  <mappers>
+    <mapper resource="org/example/UserMapper.xml"/>
+  </mappers>
+</configuration>

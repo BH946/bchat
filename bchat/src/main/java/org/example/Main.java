@@ -4,13 +4,12 @@ package org.example;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import org.example.utils.TCPClient;
-import org.example.utils.TCPServer;
-import org.example.utils.UDPClient;
-import org.example.utils.UDPServer;
+import org.example.v1.utils.TCPClient;
+import org.example.v1.utils.TCPServer;
+import org.example.v1.utils.UDPServer;
 
 /**
- * GUI 없이 테스트 Main 함수 -> utils 패키지 활용
+ * GUI 없이 테스트 Main 함수 -> v1 패키지
  */
 public class Main {
   public static void main(String[] args) throws IOException {

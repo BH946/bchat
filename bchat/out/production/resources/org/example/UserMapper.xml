@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!--
+id 값(중복불가): SQL 구분+매퍼 인터페이스의 메서드와 연결되어 쿼리를 더 쉽게 호출
+useGeneratedKeys="true": 이 속성은 데이터베이스에서 생성된 키를 반환하도록 MyBatis에 지시합니다.
+keyProperty="id": 생성된 키가 User 객체의 id 필드에 설정되도록 합니다.
+-->
+
+<mapper namespace="org.example.v2.repository.UserMapper">
+  <select id="findByIdNPw" resultType="User">
+    select * from Member where id = #{id} and pw = #{pw}
+  </select>
+
+  <insert id="saveUser" parameterType="User" useGeneratedKeys="true" keyColumn="user_id" keyProperty="user_id">
+    insert into Member (id, pw, nickname) values (#{id}, #{pw}, #{nickname})
+  </insert>
+  <insert id="saveProfile" parameterType="Profile">
+    insert into Profile (profile_id, name, col, email) values (#{profile_id}, #{name}, #{col}, #{email})
+  </insert>
+
+  <select id="findById" resultType="User">
+    select * from Member where id = #{id}
+  </select>
+  <select id="findByNickname" resultType="User">
+    select * from Member where nickname = #{nickname}
+  </select>
+
+</mapper>

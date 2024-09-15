@@ -1,15 +1,12 @@
 package org.example;
-import java.net.SocketException;
 import java.util.List;
 import javax.swing.*;
 import java.awt.*;
-import org.example.domain.Message;
-import org.example.utils.UDPServer;
-import org.example.utils.gui.TCPClientGui;
-import org.example.utils.TCPServer;
-import org.example.utils.gui.TCPServerGui;
-import org.example.utils.gui.UDPClientGui;
-import org.example.utils.gui.UDPServerGui;
+import org.example.v2.domain.Message;
+import org.example.v2.utils.TCPClientGui;
+import org.example.v2.utils.TCPServerGui;
+import org.example.v2.utils.UDPClientGui;
+import org.example.v2.utils.UDPServerGui;
 
 public class MainChatApp {
   private JFrame frame;
@@ -322,7 +319,7 @@ public class MainChatApp {
   }
 
   /**
-   * GUI 사용 메인 함수 -> utils.gui 패키지 활용
+   * GUI 사용 메인 함수 -> v2 패키지
    */
   static String udpIP = "localhost"; //고정
   static int udpPort = 9876; //고정
@@ -331,8 +328,10 @@ public class MainChatApp {
   static Long userId;
   static JTextArea chatArea;
   static JTextArea userArea;
+
   TCPClientGui tcpClientGui;
   public static void main(String[] args) {
+    // MyBatis 설정 로드
     Thread udpServerThread = new Thread(new UDPServerGui(udpPort));
     udpServerThread.start();
 
