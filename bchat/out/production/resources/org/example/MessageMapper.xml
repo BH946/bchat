@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="org.example.v2.repository.mapper.MessageMapper">
+  <insert id="save" parameterType="Message" useGeneratedKeys="true" keyColumn="message_id" keyProperty="message_id">
+    insert into Message (chatRoom_id, user_id, content) values (#{chatRoom_id}, #{user_id}, #{content})
+  </insert>
+
+  <select id="findAllByChatId" resultType="Message">
+    select * from Message where chatRoom_id = #{chatRoom_id}
+  </select>
+</mapper>

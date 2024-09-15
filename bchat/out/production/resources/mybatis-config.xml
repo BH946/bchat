@@ -16,6 +16,8 @@
   <typeAliases>
     <typeAlias type="org.example.v2.domain.User" alias="User"/>
     <typeAlias type="org.example.v2.domain.Profile" alias="Profile"/>
+    <typeAlias type="org.example.v2.domain.ChatRoom" alias="ChatRoom"/>
+    <typeAlias type="org.example.v2.domain.Message" alias="Message"/>
   </typeAliases>
 
 
@@ -32,5 +34,7 @@
   </environments>
   <mappers>
     <mapper resource="org/example/UserMapper.xml"/>
+    <mapper resource="org/example/ChatRoomMapper.xml"/>
+    <mapper resource="org/example/MessageMapper.xml"/>
   </mappers>
 </configuration>

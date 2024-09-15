@@ -18,7 +18,7 @@ public class UserService {
     return userRepository.findByIdNPw(id, pw);
   }
   /**
-   * 회원가입 -> Profile도 추가
+   * 회원가입 -> "중복검증 필수" + Profile도 추가
    */
   public void register(String[] data) {
     User user = dataToUser(data); //db에서 자동생성 필드 제외하고 create

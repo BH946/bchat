@@ -361,7 +361,7 @@ public class MainChatApp {
   public static void PrevChatUp(List<Message> prevChatList) {
     StringBuilder sb = new StringBuilder();
     for (Message msg : prevChatList) {
-      sb.append(msg.getUser_id()).append(": ").append(msg.getContent()).append("\n");
+      sb.append(msg.getUserId()).append(": ").append(msg.getContent()).append("\n");
     }
     sb.append(chatArea.getText()); //현재 채팅 이전에 삽입
     chatArea.setText(sb.toString());

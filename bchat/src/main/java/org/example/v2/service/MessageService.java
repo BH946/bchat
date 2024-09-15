@@ -9,54 +9,24 @@ import org.example.v2.domain.Message;
 import org.example.v2.repository.MessageRepository;
 
 public class MessageService {
-  private final String DRIVER = "oracle.jdbc.driver.OracleDriver";
-  private final String URL = "jdbc:oracle:thin:@localhost:1521:STR";
-  private final String DB_ID = "testUser";
-  private final String DB_PW = "1234";
-  
-  public MessageService() {};
+  private MessageRepository messageRepository;
+
+  public MessageService(MessageRepository messageRepository) {
+    this.messageRepository = messageRepository;
+  }
 
   /**
    * 메시지 조회
    */
-  public List<Message> findAllByChat(Long userId, Long chatRoomId) {
-    List<Message> findMessages = new ArrayList<>();
-    try{
-      Class.forName(DRIVER); // 드라이버를 메모리 로드
-      Connection connection = DriverManager.getConnection(URL, DB_ID, DB_PW);
-      MessageRepository messageRepository = new MessageRepository(connection);
-
-      //GUI 에서 얻은.. 정보..
-      findMessages = messageRepository.findAllByChatId(userId, chatRoomId);
-      connection.close();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    }
-    return findMessages;
+  public List<Message> findAllByChatId(Long chatRoomId) {
+    return messageRepository.findAllByChatId(chatRoomId);
   }
 
   /**
-   * 메시지 기록
+   * 메시지 기록 -> "중복 검증 없어도 됨"
    */
-  public void create(Long chatRoomId, Long userId, String content) {
-    try{
-      Class.forName(DRIVER); // 드라이버를 메모리 로드
-      Connection connection = DriverManager.getConnection(URL, DB_ID, DB_PW);
-      MessageRepository messageRepository = new MessageRepository(connection);
-
-      //GUI 에서 얻은.. 정보..
-      Message message = new Message(chatRoomId, userId, content);
-      messageRepository.save(message);
-
-      System.out.println("채팅 내용이 저장되었습니다. 생성된 ID: " + message.getMessage_id());
-      connection.close();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    }
+  public void create(Message message) {
+    messageRepository.save(message);
   }
 
 

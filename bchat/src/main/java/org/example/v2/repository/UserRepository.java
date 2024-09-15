@@ -4,6 +4,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.example.v2.domain.Profile;
 import org.example.v2.domain.User;
+import org.example.v2.repository.mapper.UserMapper;
 
 public class UserRepository {
   private SqlSessionFactory sqlSessionFactory;

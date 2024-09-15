@@ -9,8 +9,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.example.v2.SqlSessionTemplate;
 import org.example.v2.domain.ChatRoom;
 import org.example.v2.domain.Message;
+import org.example.v2.repository.ChatRoomRepository;
+import org.example.v2.repository.MessageRepository;
 import org.example.v2.service.ChatRoomService;
 import org.example.v2.service.MessageService;
 
@@ -19,26 +23,26 @@ public class TCPServerGui implements Runnable {
   private final String title;
   private static Long userId; //방장
   private static Long chatRoomId;
-  private static final MessageService messageService = new MessageService();
   private static final List<ClientHandler> clientHandlers = new ArrayList<>();
   public static final List<Long> userIdList = new ArrayList<>();
   public static List<Message> messages = new ArrayList<>();
+  private final ChatRoomService chatRoomService;
+  private static MessageService messageService;
 
   public TCPServerGui(int port, String title, Long userId) {
+    SqlSessionFactory sqlSessionFactory = SqlSessionTemplate.getSqlSessionFactory();
+    ChatRoomRepository chatRoomRepository = new ChatRoomRepository(sqlSessionFactory);
+    MessageRepository messageRepository = new MessageRepository(sqlSessionFactory);
+    this.chatRoomService = new ChatRoomService(chatRoomRepository);
+    this.messageService = new MessageService(messageRepository);
     this.port = port;
     this.title = title;
     this.userId = userId;
     //db에 최초 채팅방 생성
-    ChatRoomService chatRoomService = new ChatRoomService();
-    ChatRoom newChatRoom = chatRoomService.create(userId, title);
-    chatRoomId = newChatRoom.getChatRoom_id();
-  }
-  
-  /**
-   * 채팅기록 업데이트 함수
-   */
-  public static void updatePrevMessages() {
-    messages = messageService.findAllByChat(userId, chatRoomId);
+    ChatRoom chatRoom = ChatRoom.createChatRoom(title, userId);
+    chatRoomService.create(chatRoom);
+    chatRoom = chatRoomService.findByIdNTitle(userId, title);
+    this.chatRoomId = chatRoom.getChatRoomId();
   }
 
   @Override
@@ -91,7 +95,7 @@ public class TCPServerGui implements Runnable {
           message = input.readLine();
           System.out.println("받은 메시지: " + message); //debug
           if (message.equals("이전채팅기록요청")) {
-            updatePrevMessages();
+            messages = messageService.findAllByChatId(chatRoomId);
             messagePrevChat(messages);
             continue;
           }
@@ -99,7 +103,8 @@ public class TCPServerGui implements Runnable {
           broadcastMessage(message);
           //매번 db 기록
           String[] data = message.split(",", 2); //[userId,content]
-          messageService.create(chatRoomId, Long.parseLong(data[0]), data[1]);
+          Message msg = Message.createMessage(chatRoomId, Long.parseLong(data[0]), data[1]);
+          messageService.create(msg);
         }
       } catch (IOException e) {
         e.printStackTrace();

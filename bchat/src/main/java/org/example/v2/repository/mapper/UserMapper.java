@@ -1,4 +1,4 @@
-package org.example.v2.repository;
+package org.example.v2.repository.mapper;
 
 import org.apache.ibatis.annotations.Param;
 import org.example.v2.domain.Profile;

@@ -6,41 +6,33 @@ public class ChatRoom {
   private Long chatRoom_id; //pk
   private String title;
   private Long user_id; //fk
-  private Timestamp created_at;
+  private Timestamp created_at; //db default
 
-  public ChatRoom(String title, Long userId) {
-    this.title = title;
-    user_id = userId;
-  }
-  public ChatRoom(Long chatRoomId, String title, Long userId, Timestamp createdAt) {
-    chatRoom_id = chatRoomId;
-    this.title = title;
-    user_id = userId;
-    created_at = createdAt;
+  protected ChatRoom() {};
+
+  public void setChatRoomId(Long chatRoomId) {
+    this.chatRoom_id = chatRoomId;
   }
 
-  public void setChatRoom_id(Long chatRoom_id) {
-    this.chatRoom_id = chatRoom_id;
-  }
-
-  public void setCreated_at(Timestamp created_at) {
-    this.created_at = created_at;
-  }
-
-  public Long getChatRoom_id() {
+  public Long getChatRoomId() {
     return chatRoom_id;
   }
-
-  public Long getUser_id() {
+  public Long getUserId() {
     return user_id;
   }
-
   public String getTitle() {
     return title;
   }
-
-  public Timestamp getCreated_at() {
+  public Timestamp getCreatedAt() {
     return created_at;
+  }
+  
+  // 연관관계 메서드
+  public static ChatRoom createChatRoom(String title, Long userId) {
+    ChatRoom chatRoom = new ChatRoom();
+    chatRoom.title = title;
+    chatRoom.user_id = userId;
+    return chatRoom;
   }
 
   @Override

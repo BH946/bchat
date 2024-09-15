@@ -9,43 +9,34 @@ public class Message {
   private String content;
   private Timestamp created_at;
 
-  public Message(Long chatRoomId, Long userId, String content) {
-    chatRoom_id = chatRoomId;
-    user_id = userId;
-    this.content = content;
-  }
-  public Message(Long messageId, Long chatRoomId, Long userId, String content, Timestamp createdAt) {
-    message_id = messageId;
-    chatRoom_id = chatRoomId;
-    user_id = userId;
-    this.content = content;
-    created_at = createdAt;
+  protected Message() {};
+
+  public static Message createMessage(Long chatRoomId, Long userId, String content) {
+    Message message = new Message();
+    message.chatRoom_id = chatRoomId;
+    message.user_id = userId;
+    message.content = content;
+    return message;
   }
 
-  public void setMessage_id(Long message_id) {
-    this.message_id = message_id;
+  public void setMessage_id(Long messageId) {
+    this.message_id = messageId;
   }
-
-  public void setCreated_at(Timestamp created_at) {
-    this.created_at = created_at;
+  public void setCreatedAt(Timestamp createdAt) {
+    this.created_at = createdAt;
   }
-
-  public Long getMessage_id() {
+  public Long getMessageId() {
     return message_id;
   }
-
-  public Long getChatRoom_id() {
+  public Long getChatRoomId() {
     return chatRoom_id;
   }
-
-  public Long getUser_id() {
+  public Long getUserId() {
     return user_id;
   }
-
-  public Timestamp getCreated_at() {
+  public Timestamp getCreatedAt() {
     return created_at;
   }
-
   public String getContent() {
     return content;
   }

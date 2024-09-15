@@ -7,61 +7,40 @@ import org.example.v2.domain.ChatRoom;
 import org.example.v2.repository.ChatRoomRepository;
 
 public class ChatRoomService {
-  private final String DRIVER = "oracle.jdbc.driver.OracleDriver";
-  private final String URL = "jdbc:oracle:thin:@localhost:1521:STR";
-  private final String DB_ID = "testUser";
-  private final String DB_PW = "1234";
-  
-  public ChatRoomService() {};
+  private ChatRoomRepository chatRoomRepository;
+
+  public ChatRoomService(ChatRoomRepository chatRoomRepository) {
+    this.chatRoomRepository = chatRoomRepository;
+  }
 
   /**
    * 채팅방 조회
    */
-  public ChatRoom findByIdNTitle(Long id, String title) {
-    ChatRoom findChatRoom = null;
-    try{
-      Class.forName(DRIVER); // 드라이버를 메모리 로드
-      Connection connection = DriverManager.getConnection(URL, DB_ID, DB_PW);
-      ChatRoomRepository chatRoomRepository = new ChatRoomRepository(connection);
-
-      //GUI 에서 얻은.. 정보..
-      findChatRoom = chatRoomRepository.findByIdNTitle(id, title);
-      connection.close();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    }
-    return findChatRoom;
+  public ChatRoom findByIdNTitle(Long userId, String title) {
+    return chatRoomRepository.findByIdNTitle(userId, title);
   }
 
   /**
-   * 채팅방 생성 -> "중복검증 필요없음. 그냥 DB에 있으면 있는값을 반환"
+   * 채팅방 생성 -> "중복검증 필수"
    */
-  public ChatRoom create(Long id, String title) {
-    ChatRoom newChatRoom=null;
-    try{
-      Class.forName(DRIVER); // 드라이버를 메모리 로드
-      Connection connection = DriverManager.getConnection(URL, DB_ID, DB_PW);
-      ChatRoomRepository chatRoomRepository = new ChatRoomRepository(connection);
-
-      //중복검증 (조회 해보기)
-      newChatRoom = chatRoomRepository.findByIdNTitle(id, title);
-      if(newChatRoom!=null) return newChatRoom; // 기존 채팅방 사용
-
-      //GUI 에서 얻은.. 정보..
-      ChatRoom chatRoom = new ChatRoom(title, id);
-      newChatRoom = chatRoomRepository.save(chatRoom);
-
-      System.out.println("채팅방이 성공적으로 저장되었습니다. 생성된 ID: " + chatRoom.getChatRoom_id());
-      connection.close();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+  public void create(ChatRoom chatRoom) {
+    try {
+      //1. 중복 검증
+      validateDuplicateChatRoom(chatRoom);
+      //2. 채팅방 등록
+      chatRoomRepository.save(chatRoom);
+    } catch (IllegalStateException e) {
+      System.out.println(e.getMessage());
+      return; //중복이면 그냥 오류없이 종료 -> 어차피 해당 방 사용할거임
     }
-    return newChatRoom;
   }
 
+  private void validateDuplicateChatRoom(ChatRoom chatRoom) {
+    ChatRoom findChatRoom = chatRoomRepository.findByIdNTitle(chatRoom.getUserId(), chatRoom.getTitle());
+    if (findChatRoom != null) {
+      // IllegalStateException 예외를 호출
+      throw new IllegalStateException("이미 존재하는 채팅방입니다.");
+    }
+  }
 
 }

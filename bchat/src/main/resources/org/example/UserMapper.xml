@@ -10,7 +10,7 @@ keyProperty="id": 생성된 키가 User 객체의 id 필드에 설정되도록 �
 keyColumn="user_id": db의 user_id 필드명이 generatedKeys 임을 알려줌.
 -->
 
-<mapper namespace="org.example.v2.repository.UserMapper">
+<mapper namespace="org.example.v2.repository.mapper.UserMapper">
   <select id="findByIdNPw" resultType="User">
     select * from Member where id = #{id} and pw = #{pw}
   </select>
