@@ -1,13 +1,17 @@
 package org.example.utils.gui;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import org.example.MainChatApp;
+import org.example.domain.Message;
 
 public class TCPClientGui implements Runnable{
   private final String serverAddress;
@@ -41,15 +45,15 @@ public class TCPClientGui implements Runnable{
       while (true) {
         message = input.readLine();
         if (message.split(":")[0].equals("유저리스트 업데이트")) {
-          List<Long> userIdList = dataToList(message);
+          List<Long> userIdList = dataToUserList(message);
           MainChatApp.UserListUp(userIdList);
           continue;
+        } else if (message.split(":")[0].equals("이전채팅기록요청")) {
+          List<Message> prevChatList = dataToPrevChat(message);
+          MainChatApp.PrevChatUp(prevChatList);
+//          MainChatApp.PrevChatUp(message.split(":")[1]);
+          continue;
         }
-//        else if (message.split(":")[1].equals(" 님이 퇴장하셨습니다.")) {
-//          message = input.readLine();
-//          List<Long> userIdList = dataToList(message);
-//          MainChatApp.UserListUp(userIdList);
-//        }
         MainChatApp.getChatArea().append(message + "\n"); // 채팅 영역에 메시지 추가
         System.out.println("응답 정상"); //debug
       }
@@ -66,7 +70,10 @@ public class TCPClientGui implements Runnable{
     }
   }
 
-  public List<Long> dataToList(String message) {
+  /**
+   * data 가공 함수 - 유저리스트, 채팅기록(Gson 활용)
+   */
+  public List<Long> dataToUserList(String message) {
     List<Long> dataList = new ArrayList<>();
     message = message.split(":")[1];
     if (message.contains(",")) {
@@ -79,5 +86,11 @@ public class TCPClientGui implements Runnable{
     }
     return dataList;
   }
-
+  public List<Message> dataToPrevChat(String message) {
+    List<Message> dataList = new ArrayList<>();
+    message = message.split(":",2)[1];
+    Gson gson = new Gson();
+    Type messageListType = new TypeToken<List<Message>>(){}.getType();
+    return gson.fromJson(message, messageListType);
+  }
 }

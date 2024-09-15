@@ -1,5 +1,6 @@
 package org.example.utils.gui;
 
+import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,11 +19,12 @@ import org.example.service.MessageService;
 public class TCPServerGui implements Runnable {
   private final int port;
   private final String title;
-  private final Long userId; //방장
+  private static Long userId; //방장
   private static Long chatRoomId;
   private static final MessageService messageService = new MessageService();
   private static final List<ClientHandler> clientHandlers = new ArrayList<>();
   public static final List<Long> userIdList = new ArrayList<>();
+  public static List<Message> messages = new ArrayList<>();
 
   public TCPServerGui(int port, String title, Long userId) {
     this.port = port;
@@ -33,15 +35,12 @@ public class TCPServerGui implements Runnable {
     ChatRoom newChatRoom = chatRoomService.create(userId, title);
     chatRoomId = newChatRoom.getChatRoom_id();
   }
-
-  // 이전대화내용
-  public List<Message> findPrevMessages() {
-    List<Message> messages = new ArrayList<>();
+  
+  /**
+   * 채팅기록 업데이트 함수
+   */
+  public static void updatePrevMessages() {
     messages = messageService.findAllByChat(userId, chatRoomId);
-    for (Message msg : messages) {
-      System.out.println(msg); //debug
-    }
-    return messages;
   }
 
   @Override
@@ -52,8 +51,6 @@ public class TCPServerGui implements Runnable {
         System.out.println("서버가 포트=" + port + " 에서 대기중");
         Socket socket = serverSocket.accept(); //clientSocket
         System.out.println("클라 연결 성공");
-
-        // findPrevMessages(); //test code
 
         ClientHandler clientHandler = new ClientHandler(socket); //new Thread
         clientHandlers.add(clientHandler);
@@ -87,7 +84,7 @@ public class TCPServerGui implements Runnable {
         userIdList.add(this.userId);
         System.out.println(userId+":최초 수신");
         broadcastMessage(this.userId+",님이 입장했습니다."); //->TCPClientGui
-        broadcastMessage(userIdList); //->TCPClientGui (유저리스트 업데이트)
+        broadcastMessageUserList(userIdList); //->TCPClientGui (유저리스트 업데이트)
         System.out.println(userId+":최초 응답");
         
         while (true) {
@@ -95,6 +92,11 @@ public class TCPServerGui implements Runnable {
           //이 내부를 전체 클라에게 메시지 주는것으로 바꿔야 함. -> db는 1번만 저장
           message = input.readLine();
           System.out.println("받은 메시지: " + message); //debug
+          if (message.equals("이전채팅기록요청")) {
+            updatePrevMessages();
+            messagePrevChat(messages);
+            continue;
+          }
           // 모든 클라이언트에게 메시지 전송
           broadcastMessage(message);
           //매번 db 기록
@@ -108,7 +110,7 @@ public class TCPServerGui implements Runnable {
           System.out.println("일반유저 채팅 종료시 이부분 수행");
           userIdList.remove(userId);
           broadcastMessage(this.userId+",님이 퇴장하셨습니다."); //->TCPClientGui
-          broadcastMessage(userIdList); //->TCPClientGui (유저리스트 업데이트)
+          broadcastMessageUserList(userIdList); //->TCPClientGui (유저리스트 업데이트)
 
           socket.close();
           clientHandlers.remove(this);
@@ -120,7 +122,7 @@ public class TCPServerGui implements Runnable {
     }
 
     /**
-     * List 타입은 유저조회 용도
+     * 메시지 전송 함수 - 기본, 유저조회, 채팅조회(GSON 활용)
      */
     private void broadcastMessage(String message) {
       String[] messages = message.split(",",2);
@@ -128,7 +130,7 @@ public class TCPServerGui implements Runnable {
         clientHandler.output.println(messages[0]+": "+messages[1]); //응답 메시지 전송
       }
     }
-    private void broadcastMessage(List<Long> messages) {
+    private void broadcastMessageUserList(List<Long> messages) {
       // List<Long>를 문자열로 변환
       StringBuilder sb = new StringBuilder();
       for (Long message : messages) {
@@ -144,6 +146,27 @@ public class TCPServerGui implements Runnable {
       for (ClientHandler clientHandler : clientHandlers) {
         clientHandler.output.println("유저리스트 업데이트:"+sb);
       }
+    }
+    private void messagePrevChat(List<Message> messages) {
+      Gson gson = new Gson();
+      StringBuilder sb = new StringBuilder();
+      sb.append("["); //배열 시작(JSON)
+
+      for (int i = 0; i < messages.size(); i++) {
+        Message msg = messages.get(i);
+        String jsonMsg = gson.toJson(msg);
+        sb.append(jsonMsg);
+        // 마지막 메시지가 아닐 경우 쉼표 추가 -> 빈 공백 데이터 끝에 방지
+        if (i < messages.size() - 1) {
+          sb.append(", "); //Json 형태 쉼표
+        }
+      }
+
+      sb.append("]"); //배열 끝(JSON)
+      // 클라이언트에게 메시지 전송
+      this.output.println("이전채팅기록요청:"+sb);
+
+      System.out.println(sb); //debug
     }
   }
 

@@ -3,6 +3,7 @@ import java.net.SocketException;
 import java.util.List;
 import javax.swing.*;
 import java.awt.*;
+import org.example.domain.Message;
 import org.example.utils.UDPServer;
 import org.example.utils.gui.TCPClientGui;
 import org.example.utils.TCPServer;
@@ -311,6 +312,8 @@ public class MainChatApp {
     });
     // #채팅기록
     chatHistoryButton.addActionListener(e -> {
+      // 서버로 메시지 전송 로직 추가
+      tcpClientGui.out.println("이전채팅기록요청");
       // 채팅 기록 보여주는 로직 추가 (예: JOptionPane 사용)
       JOptionPane.showMessageDialog(panel, chatArea.getText(), "채팅 기록", JOptionPane.PLAIN_MESSAGE);
     });
@@ -353,4 +356,15 @@ public class MainChatApp {
     }
   }
 
+  /**
+   * 이전채팅 기록 조회 업뎃
+   */
+  public static void PrevChatUp(List<Message> prevChatList) {
+    StringBuilder sb = new StringBuilder();
+    for (Message msg : prevChatList) {
+      sb.append(msg.getUser_id()).append(": ").append(msg.getContent()).append("\n");
+    }
+    sb.append(chatArea.getText()); //현재 채팅 이전에 삽입
+    chatArea.setText(sb.toString());
+  }
 }
