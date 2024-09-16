@@ -62,13 +62,13 @@ public class UDPServerGui implements Runnable {
       //로그인 진행
       User findUser = userService.login(data[0], data[1]); //id, pw
       if (findUser != null) {
-        response = findUser.getUserId() + ",로그인에 성공하셨습니다.";
+        response = findUser.getUserId() + "," + ConstanctMsg.LOGIN_SUCCESS;
       } else {
-        response = "아이디 또는 비밀번호가 잘못되었습니다.";
+        response = ConstanctMsg.LOGIN_FAIL;
       }
     } else {
       //회원가입 진행
-      response = "회원가입을 완료 했습니다.";
+      response = ConstanctMsg.REGISTER_SUCCESS;
       try {
         userService.register(data);
       } catch (IllegalStateException e) {

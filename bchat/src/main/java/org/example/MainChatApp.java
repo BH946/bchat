@@ -104,7 +104,7 @@ public class MainChatApp {
       UDPClientGui udpClientGui = new UDPClientGui(udpIP, udpPort, data);
       udpClientGui.udpClientLogin();
       String[] response = udpClientGui.getResponse().split(",", 2);
-      if (response[1].equals("로그인에 성공하셨습니다.")) {
+      if (response[1].equals(ConstanctMsg.LOGIN_SUCCESS)) {
         cardLayout.show(frame.getContentPane(), "home");
         userId = Long.parseLong(response[0]);
       } else {
@@ -156,7 +156,7 @@ public class MainChatApp {
           phoneField.getText(), emailField.getText()};
       UDPClientGui udpClientGui = new UDPClientGui(udpIP, udpPort, data);
       udpClientGui.udpClientRegister();
-      if (udpClientGui.getResponse().equals("회원가입을 완료 했습니다.")) {
+      if (udpClientGui.getResponse().equals(ConstanctMsg.REGISTER_SUCCESS)) {
         cardLayout.show(frame.getContentPane(), "login");
       } else {
         // 회원가입 실패 메시지 표시

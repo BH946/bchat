@@ -7,6 +7,7 @@ import java.net.SocketException;
 import java.util.Arrays;
 import org.example.v1.domain.User;
 import org.example.v1.service.UserService;
+import org.example.v2.utils.ConstanctMsg;
 
 public class UDPServer implements Runnable {
   private final int port;
@@ -33,13 +34,13 @@ public class UDPServer implements Runnable {
         UserService userService = new UserService();
         if (data.length == 2) {
           //로그인 진행
-          response = "로그인에 성공하셨습니다.";
+          response = ConstanctMsg.LOGIN_SUCCESS;
           User findUser = userService.login(data[0], data[1]); //id, pw
           if (findUser == null)
             response = "로그인에 실패했습니다.";
         } else {
           //회원가입 진행
-          response = "회원가입을 완료 했습니다.";
+          response = ConstanctMsg.REGISTER_SUCCESS;
           try {
             userService.register(data);
           } catch (IllegalStateException e) {

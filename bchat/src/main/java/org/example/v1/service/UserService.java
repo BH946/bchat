@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import org.example.v1.domain.Profile;
 import org.example.v1.domain.User;
 import org.example.v1.repository.UserRepository;
+import org.example.v2.utils.ConstanctMsg;
 
 public class UserService {
   //test
@@ -80,7 +81,7 @@ public class UserService {
       User findUser = userRepository.findById(id);
       if (findUser != null) {
         // IllegalStateException 예외를 호출
-        throw new IllegalStateException("이미 존재하는 회원입니다.");
+        throw new IllegalStateException(ConstanctMsg.REGISTER_FAIL);
       }
 
       findUser = userRepository.findByNickname(nickname);
