@@ -5,11 +5,12 @@ import org.example.v2.domain.User;
 import org.example.v2.repository.UserRepository;
 
 public class UserService {
+
   private UserRepository userRepository;
 
   public UserService(UserRepository userRepository) {
     this.userRepository = userRepository;
-  };
+  }
 
   /**
    * 로그인
@@ -17,6 +18,7 @@ public class UserService {
   public User login(String id, String pw) {
     return userRepository.findByIdNPw(id, pw);
   }
+
   /**
    * 회원가입 -> "중복검증 필수" + Profile도 추가
    */
@@ -29,6 +31,7 @@ public class UserService {
     Profile profile = dataToProfile(user.getUserId(), data);
     userRepository.save(profile);
   }
+
   private void validateDuplicateUser(String id, String nickname) {
     User findUser = userRepository.findById(id);
     if (findUser != null) {
@@ -51,6 +54,7 @@ public class UserService {
     User user = User.createUser(data[0], data[1], data[2]);
     return user;
   }
+
   private Profile dataToProfile(Long profile_id, String[] data) {
     Profile profile = Profile.createProfile(profile_id, data[3], data[4], data[5]);
     return profile;

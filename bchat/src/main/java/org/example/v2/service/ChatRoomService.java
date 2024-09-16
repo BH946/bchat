@@ -1,12 +1,10 @@
 package org.example.v2.service;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import org.example.v2.domain.ChatRoom;
 import org.example.v2.repository.ChatRoomRepository;
 
 public class ChatRoomService {
+
   private ChatRoomRepository chatRoomRepository;
 
   public ChatRoomService(ChatRoomRepository chatRoomRepository) {
@@ -36,7 +34,8 @@ public class ChatRoomService {
   }
 
   private void validateDuplicateChatRoom(ChatRoom chatRoom) {
-    ChatRoom findChatRoom = chatRoomRepository.findByIdNTitle(chatRoom.getUserId(), chatRoom.getTitle());
+    ChatRoom findChatRoom = chatRoomRepository.findByIdNTitle(chatRoom.getUserId(),
+        chatRoom.getTitle());
     if (findChatRoom != null) {
       // IllegalStateException 예외를 호출
       throw new IllegalStateException("이미 존재하는 채팅방입니다.");

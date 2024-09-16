@@ -13,13 +13,17 @@ import java.util.List;
 import org.example.MainChatApp;
 import org.example.v2.domain.Message;
 
-public class TCPClientGui implements Runnable{
+public class TCPClientGui implements Runnable {
+
   private final String serverAddress;
   private final int port;
   private final Long userId;
-  public Socket socket;
-  public PrintWriter out;
-  public BufferedReader input;
+  private PrintWriter output; //외부에서 사용 (MainChatApp)
+  private volatile boolean blocking = true;
+
+  public boolean isBlocking() {
+    return blocking;
+  }
 
   public TCPClientGui(String serverAddress, int port, Long userId) {
     this.serverAddress = serverAddress;
@@ -27,53 +31,52 @@ public class TCPClientGui implements Runnable{
     this.userId = userId;
   }
 
+  public PrintWriter getOutput() {
+    return output;
+  }
+
   @Override
   public void run() {
-    try {
-      socket = new Socket(serverAddress, port);
-      System.out.println("소켓 되냐?"+socket); //debug
-      out = new PrintWriter(socket.getOutputStream(), true);
-      input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+    try (Socket socket = new Socket(serverAddress, port);
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        BufferedReader input = new BufferedReader(
+            new InputStreamReader(socket.getInputStream()));) {
+      this.output = out;
+      this.blocking = false; //블로킹 해제
+      System.out.println("소켓: " + socket); //debug
       System.out.println("Stream 세팅 - 소켓(서버), 클라"); //debug
       String message;
 
-      // (입장알림)최초 전송 -> userIdList 관리위해 초기 SET
-      out.println(userId);
-      System.out.println(userId+":최초 전송");
-
-      // 응답
+      // 수신 -> 요청은 MainChatApp 담당
       while (true) {
         message = input.readLine();
-        if (message.split(":")[0].equals("유저리스트 업데이트")) {
-          List<Long> userIdList = dataToUserList(message);
-          MainChatApp.UserListUp(userIdList);
-          continue;
-        } else if (message.split(":")[0].equals("이전채팅기록요청")) {
-          List<Message> prevChatList = dataToPrevChat(message);
-          MainChatApp.PrevChatUp(prevChatList);
-//          MainChatApp.PrevChatUp(message.split(":")[1]);
-          continue;
-        }
-        MainChatApp.getChatArea().append(message + "\n"); // 채팅 영역에 메시지 추가
-        System.out.println("응답 정상"); //debug
+        addResponseChat(message);
       }
-
     } catch (IOException e) {
       e.printStackTrace();
     }
-    finally {
-      try {
-        socket.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+  }
+
+  /**
+   * 서버로부터 응답받았을 때 수행 함수
+   */
+  private void addResponseChat(String message) {
+    if (message.split(":")[0].equals(ConstanctMsg.USER_LIST_FLAG)) {
+      List<Long> userIdList = dataToUserList(message);
+      MainChatApp.UserListUp(userIdList);
+    } else if (message.split(":")[0].equals(ConstanctMsg.PREV_CHAT_FLAG)) {
+      List<Message> prevChatList = dataToPrevChat(message);
+      MainChatApp.PrevChatUp(prevChatList);
+    } else { //위 2가지 외: 일반 메시지를 의미
+      MainChatApp.getChatArea().append(message + "\n"); // 채팅 영역에 메시지 추가
+      System.out.println("응답 정상"); //debug
     }
   }
 
   /**
    * data 가공 함수 - 유저리스트, 채팅기록(Gson 활용)
    */
-  public List<Long> dataToUserList(String message) {
+  private List<Long> dataToUserList(String message) {
     List<Long> dataList = new ArrayList<>();
     message = message.split(":")[1];
     if (message.contains(",")) {
@@ -86,11 +89,12 @@ public class TCPClientGui implements Runnable{
     }
     return dataList;
   }
-  public List<Message> dataToPrevChat(String message) {
-    List<Message> dataList = new ArrayList<>();
-    message = message.split(":",2)[1];
+
+  private List<Message> dataToPrevChat(String message) {
+    message = message.split(":", 2)[1];
     Gson gson = new Gson();
-    Type messageListType = new TypeToken<List<Message>>(){}.getType();
+    Type messageListType = new TypeToken<List<Message>>() {
+    }.getType();
     return gson.fromJson(message, messageListType);
   }
 }

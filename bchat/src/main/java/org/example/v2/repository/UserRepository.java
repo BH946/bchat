@@ -7,6 +7,7 @@ import org.example.v2.domain.User;
 import org.example.v2.repository.mapper.UserMapper;
 
 public class UserRepository {
+
   private SqlSessionFactory sqlSessionFactory;
 
   public UserRepository(SqlSessionFactory sqlSessionFactory) {
@@ -24,6 +25,7 @@ public class UserRepository {
       return user; //생성된 generatedKeys 포함
     }
   }
+
   public Profile save(Profile profile) {
     try (SqlSession session = sqlSessionFactory.openSession()) {
       UserMapper mapper = session.getMapper(UserMapper.class);

@@ -10,6 +10,7 @@ public interface UserMapper {
    * 회원가입
    */
   void saveUser(User user);
+
   void saveProfile(Profile profile);
 
   /**
@@ -21,5 +22,6 @@ public interface UserMapper {
    * 조회
    */
   User findById(String id); //아이디로 찾기
+
   User findByNickname(String nickname); //닉네임으로 찾기
 }

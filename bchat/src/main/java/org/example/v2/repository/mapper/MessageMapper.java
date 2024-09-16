@@ -1,6 +1,5 @@
 package org.example.v2.repository.mapper;
 
-import java.sql.SQLException;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.example.v2.domain.Message;

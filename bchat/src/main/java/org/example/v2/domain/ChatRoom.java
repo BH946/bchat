@@ -3,12 +3,15 @@ package org.example.v2.domain;
 import java.sql.Timestamp;
 
 public class ChatRoom {
+
   private Long chatRoom_id; //pk
   private String title;
   private Long user_id; //fk
   private Timestamp created_at; //db default
 
-  protected ChatRoom() {};
+  protected ChatRoom() {
+  }
+  
 
   public void setChatRoomId(Long chatRoomId) {
     this.chatRoom_id = chatRoomId;
@@ -17,16 +20,19 @@ public class ChatRoom {
   public Long getChatRoomId() {
     return chatRoom_id;
   }
+
   public Long getUserId() {
     return user_id;
   }
+
   public String getTitle() {
     return title;
   }
+
   public Timestamp getCreatedAt() {
     return created_at;
   }
-  
+
   // 연관관계 메서드
   public static ChatRoom createChatRoom(String title, Long userId) {
     ChatRoom chatRoom = new ChatRoom();

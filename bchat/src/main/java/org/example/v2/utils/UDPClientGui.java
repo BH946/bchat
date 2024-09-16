@@ -8,10 +8,11 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 public class UDPClientGui {
+
   private final String serverAddress;
   private final int serverPort;
   private String[] data;
-  private String response; //"로그인에 실패했습니다.", "회원가입을 완료 했습니다.", "로그인에 성공하셨습니다."
+  private String response; //예상 답변: "아이디 또는 비밀번호가 잘못되었습니다.", "회원가입을 완료 했습니다.", "로그인에 성공하셨습니다.", "이미 존재하는 회원입니다."
 
   public UDPClientGui(String serverAddress, int serverPort, String[] data) {
     this.serverAddress = serverAddress;
@@ -30,19 +31,21 @@ public class UDPClientGui {
     try {
       //전송
       DatagramSocket socket = new DatagramSocket();
-      String str = data[0]+","+data[1]+","+data[2]+","+data[3]+","+data[4]+","+data[5];
-      byte[] buffer = str.getBytes();
-      System.out.println(str);
-      DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(serverAddress), serverPort);
+      String input =
+          data[0] + "," + data[1] + "," + data[2] + "," + data[3] + "," + data[4] + "," + data[5];
+      byte[] buffer = input.getBytes();
+      DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
+          InetAddress.getByName(serverAddress), serverPort);
       socket.send(packet);
 
       //응답
       byte[] resBuf = new byte[512];
       DatagramPacket resPacket = new DatagramPacket(resBuf, resBuf.length);
       socket.receive(resPacket); //대기
-      response = new String(resPacket.getData(),0, resPacket.getLength());
+      response = new String(resPacket.getData(), 0, resPacket.getLength());
       System.out.println(response); //debug
 
+      socket.close();
     } catch (SocketException e) {
       e.printStackTrace();
     } catch (UnknownHostException e) {
@@ -59,19 +62,21 @@ public class UDPClientGui {
     try {
       //전송
       DatagramSocket socket = new DatagramSocket();
-      String str = data[0]+","+data[1];
-      byte[] buffer = str.getBytes();
-      System.out.println(str);
-      DatagramPacket packet = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(serverAddress), serverPort);
+      String input = data[0] + "," + data[1];
+      byte[] buffer = input.getBytes();
+      System.out.println(input);
+      DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
+          InetAddress.getByName(serverAddress), serverPort);
       socket.send(packet);
 
       //응답
       byte[] resBuf = new byte[512];
       DatagramPacket resPacket = new DatagramPacket(resBuf, resBuf.length);
       socket.receive(resPacket); //대기
-      response = new String(resPacket.getData(),0, resPacket.getLength());
-      System.out.println("로그인 응답: "+response); //debug
+      response = new String(resPacket.getData(), 0, resPacket.getLength());
+      System.out.println("로그인 응답: " + response); //debug
 
+      socket.close();
     } catch (SocketException e) {
       e.printStackTrace();
     } catch (UnknownHostException e) {

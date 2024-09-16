@@ -1,15 +1,12 @@
 package org.example.v2.repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.example.v2.domain.ChatRoom;
 import org.example.v2.repository.mapper.ChatRoomMapper;
 
 public class ChatRoomRepository {
+
   private SqlSessionFactory sqlSessionFactory;
 
   public ChatRoomRepository(SqlSessionFactory sqlSessionFactory) {

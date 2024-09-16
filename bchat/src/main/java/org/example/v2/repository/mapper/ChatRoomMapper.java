@@ -13,6 +13,5 @@ public interface ChatRoomMapper {
   /**
    * 채팅방 조회
    */
-//  ChatRoom findByIdNTitle(@Param("created_id") Long userId, @Param("title") String title);
   ChatRoom findByIdNTitle(@Param("user_id") Long userId, @Param("title") String title);
 }
