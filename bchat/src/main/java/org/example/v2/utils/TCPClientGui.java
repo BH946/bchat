@@ -21,14 +21,14 @@ public class TCPClientGui implements Runnable {
   private PrintWriter output; //외부에서 사용 (MainChatApp)
   private volatile boolean blocking = true;
 
-  public boolean isBlocking() {
-    return blocking;
-  }
-
   public TCPClientGui(String serverAddress, int port, Long userId) {
     this.serverAddress = serverAddress;
     this.port = port;
     this.userId = userId;
+  }
+
+  public boolean isBlocking() {
+    return blocking;
   }
 
   public PrintWriter getOutput() {
@@ -43,17 +43,20 @@ public class TCPClientGui implements Runnable {
             new InputStreamReader(socket.getInputStream()));) {
       this.output = out;
       this.blocking = false; //블로킹 해제
-      System.out.println("소켓: " + socket); //debug
-      System.out.println("Stream 세팅 - 소켓(서버), 클라"); //debug
-      String message;
+      System.out.println("Connected to server"); //debug
 
       // 수신 -> 요청은 MainChatApp 담당
-      while (true) {
-        message = input.readLine();
-        addResponseChat(message);
-      }
+      listenForMessages(input);
+      
     } catch (IOException e) {
       e.printStackTrace();
+    }
+  }
+
+  private void listenForMessages(BufferedReader input) throws IOException {
+    String message;
+    while ((message = input.readLine()) != null) {
+      addResponseChat(message);
     }
   }
 

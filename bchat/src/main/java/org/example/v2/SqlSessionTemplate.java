@@ -21,7 +21,7 @@ public class SqlSessionTemplate {
       Reader reader = Resources.getResourceAsReader(resource);
       sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader); //Builder 로 설정 간단히.
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new RuntimeException("Failed to initialize SqlSessionFactory: " + e.getMessage(), e);
     }
   }
 
