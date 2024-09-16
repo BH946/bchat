@@ -25,11 +25,7 @@ public class User {
   public String getNickname() {
     return nickname;
   }
-
-  public void setUserId(Long userId) {
-    this.user_id = userId;
-  }
-
+  
   // 연관관계 메서드
   public static User createUser(String id, String pw, String nickname) {
     User user = new User();

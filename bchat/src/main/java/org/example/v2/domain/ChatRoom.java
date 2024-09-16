@@ -11,11 +11,6 @@ public class ChatRoom {
 
   protected ChatRoom() {
   }
-  
-
-  public void setChatRoomId(Long chatRoomId) {
-    this.chatRoom_id = chatRoomId;
-  }
 
   public Long getChatRoomId() {
     return chatRoom_id;

@@ -21,15 +21,7 @@ public class Message {
     message.content = content;
     return message;
   }
-
-  public void setMessage_id(Long messageId) {
-    this.message_id = messageId;
-  }
-
-  public void setCreatedAt(Timestamp createdAt) {
-    this.created_at = createdAt;
-  }
-
+  
   public Long getMessageId() {
     return message_id;
   }
